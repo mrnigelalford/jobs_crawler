@@ -40,3 +40,17 @@ schedule jobs to start and stop crawler
 1. Job list is stored in `jobList.ts`.
 2. This list is pulle into the crawler and recursed
 3. All data is stored in `storage/jobSearch.json`
+
+### Job boards scrapped via Cheerio
+  Greenhouse
+    - Rivian
+    - Samsung
+    - Xosinc
+
+### Tesla
+  Make a `GET` request to the the career site API
+    ```https://www.tesla.com/cua-api/apps/careers/state```
+    sample data can be found here: src/mockTeslaData.json
+
+
+Data stored in Mongodb database
