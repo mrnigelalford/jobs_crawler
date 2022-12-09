@@ -5,7 +5,10 @@
     "description": "This is an example of a Crawlee project.",
     "dependencies": {
         "crawlee": "^3.0.0",
+        "crawler": "^1.3.0",
+        "dotenv": "^16.0.3",
         "mongodb": "^4.12.1",
+        "node-fetch": "^3.3.0",
         "playwright": "*"
     },
     "devDependencies": {
@@ -17,6 +20,8 @@
         "start": "npm run start:dev",
         "start:prod": "node dist/main.js",
         "start:dev": "ts-node-esm -T src/main.ts",
+        "wp:dev": "ts-node-esm -T src/publishJobPost.ts",
+        "get_listing_info": "ts-node-esm -T src/getListingInfo.ts",
         "build": "tsc",
         "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
     },

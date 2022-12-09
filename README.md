@@ -31,8 +31,11 @@ You can find more examples and documentation at the following links:
 
 ### Next Steps and data tasks
 
-store jobs per company
-track job posting TTL
+[x] store jobs per company
+[x] track job posting TTL
+[x] pull relevant data per job listing
+  (titie, location, description, apply now link, company logo)
+[] create job listing page/site
 time to walk the job list per day
 schedule jobs to start and stop crawler
 
@@ -52,5 +55,15 @@ schedule jobs to start and stop crawler
     ```https://www.tesla.com/cua-api/apps/careers/state```
     sample data can be found here: src/mockTeslaData.json
 
+    ```
+    // build tesla url string:
+      store-leader-163402
+      title = str.replace(/\s+/g, '-').toLowerCase();
+      https://www.tesla.com/careers/search/job/[title][id]
+    ```
 
-Data stored in Mongodb database
+Data is stored in Mongodb database
+
+## Notes
+
+All Rivian jobs should have `#app` added to their URL to send the applicant to the job application. Confirm this for other greenhouse jobs
