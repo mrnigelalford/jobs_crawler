@@ -1,53 +1,22 @@
 // For more information, see https://crawlee.dev/
-import { PlaywrightCrawler, CheerioCrawler } from 'crawlee';
+import { CheerioCrawler } from 'crawlee';
 import { greenhouseBoards } from './jobList.js';
-import { setPost } from './publishJobPost.js';
-import fs from 'fs';
 import { MongoClient } from "mongodb";
 import { FeaturedMedia, JobPost, Meta, Status } from './JobPost.type.js';
+import { getListingInfo } from './getListingInfo.js';
+
 import dotenv from 'dotenv'
+import fetch from 'node-fetch';
 
 dotenv.config();
 
 const client = new MongoClient(process.env.mongo_url || '');
 const db = client.db('evhunt');
-const jobFile = './storage/jobSearch.json';
 
-interface Listing { title: string; url: string; dateFound: string }
+const greenhouseCrawl = () => {
+    const urls: string[] = [];
+    greenhouseBoards.forEach(b => urls.push(b.urls[0])); // combine all urls into a single array for searching
 
-interface StoreProps {
-    title: string;
-    url?: string;
-}
-
-const storeLink = (store: StoreProps) => {
-    const fileData = JSON.parse(fs.readFileSync(jobFile, { encoding: 'utf8' }));
-    fileData.push(store);
-    fs.writeFileSync(jobFile, JSON.stringify(fileData, null, 4), 'utf-8')
-}
-
-const crawler = new PlaywrightCrawler({
-    // Use the requestHandler to process each of the crawled pages.
-    async requestHandler({ request, page, enqueueLinks, log }) {
-        const title = await page.title();
-        log.info(`Title of ${request.loadedUrl} is '${title}'`);
-
-        // Save results as JSON to ./storage/datasets/default
-        storeLink({ title, url: request.loadedUrl });
-
-        // Extract links from the current page
-        // and add them to the crawling queue.
-        await enqueueLinks({
-            regexps: [/(\/careers)/g, /(jobs)/g],
-            strategy: 'same-domain'
-        });
-    },
-    // Uncomment this option to see the browser window.
-    // headless: false,
-});
-
-
-const greenhouseCrawl = async (url: string, company: string) => {
     const cheerio = new CheerioCrawler({
         minConcurrency: 5,
         maxConcurrency: 10,
@@ -57,7 +26,6 @@ const greenhouseCrawl = async (url: string, company: string) => {
 
         // Increase the timeout for processing of each page.
         requestHandlerTimeoutSecs: 30,
-
 
         async requestHandler({ request, $ }) {
             // Store the results to the dataset. In local configuration,
@@ -77,12 +45,12 @@ const greenhouseCrawl = async (url: string, company: string) => {
                 }
             });
 
-            const rivianDB = client.db('evhunt').collection(company);
+            const company = greenhouseBoards.filter(b => b.urls[0] === request.url)[0].company;
+            console.debug('company: ', company)
+            const db = client.db('evhunt').collection(company);
 
-            // insert job if its not found
-            finalArray.forEach(job => {
-                rivianDB.updateOne({ url: job.url }, { $set: job }, { upsert: true })
-            })
+            // insert job if its not found in db
+            finalArray.forEach(job => db.updateOne({ url: job.url }, { $set: job }, { upsert: true }))
         },
 
         // This function is called if the page processing failed more than maxRequestRetries + 1 times.
@@ -91,52 +59,63 @@ const greenhouseCrawl = async (url: string, company: string) => {
         },
     });
 
-    cheerio.run([url]).then(() => console.log('finished processing: ', url))
+    cheerio.run(urls).then(() => { console.log('finished processing ') })
 }
 
-// TODO: Uncomment this to walk the boards
-// greenhouseBoards.forEach(job => {
-//     greenhouseCrawl(job.urls[0], job.company)
-// })
+const setToWordPress = () => {
+    const buff = Buffer.from(process.env.username + ":" + process.env.password);
+    let base64data = buff.toString('base64');
 
-// getListingInfo;
-
-
-//query mongo
-// pull listing
-// pull metadata
-// build a post
-// post it.
-// repeat
-
-const getStuff = () => {
     greenhouseBoards.forEach(async (board) => {
         // if (board.company.toLowerCase() !== 'xosinc') return;
         const metadata = await db.collection('companyMetadata').findOne({ _company_name: board.company });
-        const listings = await db.collection(board.company).find({ "published": false }).toArray();
+        const listings = await db.collection(board.company).find({ "listingInfo": { $exists: true }, published: false }).toArray();
         if (!metadata) return
-        listings.forEach(async (l, i) => {
-            if (l) {
-                metadata['_job_location'] = l._job_location;
-                metadata['_application'] = `${l.url}#app`;
-                metadata['title'] = l.title;
+        listings.forEach((l, i) => {
+            metadata['_job_location'] = l._job_location;
+            metadata['_application'] = `${l.url}#app`;
+            metadata['title'] = l.title;
 
-                const post: JobPost = {
-                    slug: l.title.replace(/\s/g, '_'),
-                    status: Status.draft,
-                    title: l.title,
-                    content: l.listingInfo,
-                    author: 1,
-                    featured_media: FeaturedMedia[board.company],
-                    template: '',
-                    meta: metadata as unknown as Meta,
-                    "job-types": [3]
-                }
-
-                setPost(post, board.company)
+            const post: JobPost = {
+                slug: l.title.replace(/\s/g, '_'),
+                status: Status.draft,
+                title: l.title,
+                content: l.listingInfo,
+                author: 2,
+                featured_media: FeaturedMedia[board.company],
+                template: '',
+                meta: metadata as unknown as Meta,
+                "job-types": [3]
             }
+
+            return setTimeout(() => fetch(process.env.wp_endpoint || '', {
+                method: 'post',
+                body: JSON.stringify(post),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic ' + base64data
+                }
+            }).then((response) => {
+                if (response.status === 200 || response.status === 201) {
+                    console.debug('set successful: ', board.company, ' | ', response.status)
+                    db.collection(board.company).updateOne({ url: metadata['_application'] }, { $set: { "published": true } })
+                }
+            }), 2500
+            )
         })
     })
 }
 
-getStuff();
+const hydrateListing = () => {
+    const boards: string[] = [];
+    greenhouseBoards.forEach(b => boards.push(b.urls[0])); // combine all urls into a single array for searching
+
+    boards.forEach(u => getListingInfo(u))
+}
+
+export {
+    greenhouseCrawl, // 1. walk all greenhouse boards
+    hydrateListing,  // 2. add missing data to database
+    setToWordPress   // 3. publish job to wordpress
+}
+

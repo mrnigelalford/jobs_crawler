@@ -1,5 +1,4 @@
-import { MongoClient, WithId } from "mongodb";
-import { greenhouseBoards } from './jobList.js';
+import { MongoClient } from "mongodb";
 import { CheerioCrawler } from 'crawlee';
 import dotenv from 'dotenv'
 
@@ -37,20 +36,19 @@ const crawl = async (urls: any[], company: string) => {
     },
   });
 
-  cheerio.run(urls).then((onfulfilled => {
+  return cheerio.run(urls).then((onfulfilled => {
     process.exit(0);
   }))
 }
 
 const getListingInfo = async (companyName: string) => {
-  const companies = db.collection(companyName);
-  const listings = companies.find({ "published": false, closed: false }).project({ url: 1, _id: 0 }).toArray();
   const cleanedURLs: string[] = [];
+  const listings = db.collection(companyName).find({ "published": false, closed: false }).project({ url: 1, _id: 0 }).toArray();
   (await listings).forEach(l => cleanedURLs.push(l.url));
   crawl(cleanedURLs, companyName)
 };
 
-getListingInfo(greenhouseBoards[0].company)
+// getListingInfo(greenhouseBoards[0].company)
 
 export {
   getListingInfo

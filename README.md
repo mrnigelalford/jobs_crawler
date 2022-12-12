@@ -35,7 +35,8 @@ You can find more examples and documentation at the following links:
 [x] track job posting TTL
 [x] pull relevant data per job listing
   (titie, location, description, apply now link, company logo)
-[] create job listing page/site
+[x] create job listing page/site
+  clean code and create starting points
 time to walk the job list per day
 schedule jobs to start and stop crawler
 

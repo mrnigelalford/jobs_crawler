@@ -19,7 +19,9 @@
     "scripts": {
         "start": "npm run start:dev",
         "start:prod": "node dist/main.js",
-        "start:dev": "ts-node-esm -T src/main.ts",
+        "step:greenhouseCrawl": "ts-node-esm -T src/step.greenhouseCrawl.ts",
+        "step:hydrateListing": "ts-node-esm -T src/step.hydrateListing.ts",
+        "step:setToWordpress": "ts-node-esm -T src/step.setToWordpress.ts",
         "wp:dev": "ts-node-esm -T src/publishJobPost.ts",
         "get_listing_info": "ts-node-esm -T src/getListingInfo.ts",
         "build": "tsc",
