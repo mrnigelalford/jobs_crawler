@@ -47,6 +47,38 @@ const greenhouseBoards = [
   }
 ]
 
+// NOTE: This info is stored in mongo. Keeping this here in case db needs to be rehydrated
+const companyMetadata = [
+  {
+    _company_name: 'Rivian',
+    _company_website: 'https://rivian.com',
+    _company_tagline: 'Rivian is on a mission to keep the world adventurous forever. This goes for the emissions-free Electric Adventure Vehicles we build, and the curious, courageous souls we seek to attract.',
+    _company_twitter: 'https://twitter.com/rivian',
+    _company_video: 'https://videos.rivian.com/2md5qhoeajym/2SKNPrlw8JnbBdUFC4npiy/8cd6cddc208eeab19bba9d8e745fc05d/2021-Video-RJ-Scaringe-01.mp4'
+  },
+  {
+    _company_name: 'Samsung Semiconductor',
+    _company_website: 'https://semiconductor.samsung.com',
+    _company_tagline: 'he products and technology we develop are used by world leaders in Mobile, Automotive, AR/VR, Gaming, IoT, Edge, AI and are enabling unprecedented growth in enterprise and hyper-scale data centers.',
+    _company_twitter: 'https://www.twitter.com/samsungdsglobal',
+    _company_video: 'https://news.samsung.com/medialibrary/download/53098/medium'
+  },
+  {
+    _company_name: 'Xosinc',
+    _company_website: 'https://xostrucks.com',
+    _company_tagline: 'an innovative electric vehicle company on a mission to decarbonize commercial transportation. Our zero-emission commercial vehicles and next-generation technologies empower fleets of Fortune 500 companies and positively impact our environment.',
+    _company_twitter: 'https://twitter.com/xostrucks',
+    _company_video: 'https://www.dropbox.com/sh/zx31zqs7dtf5m2q/AACb0OOKW_EPbqfVwA21yfMta/B-Roll/Xos%20B-roll%20-%20Overview%20ProRes.mov?dl=0'
+  },
+  {
+    _company_name: 'Faraday Future',
+    _company_website: 'https://www.ff.com',
+    _company_tagline: 'Faraday Future (FF) is a California-based global shared intelligent mobility ecosystem company focusing on building the next generation of intelligent mobility ecosystems. Established in May 2014, the company is headquartered in Los Angeles with R&D Center and Futurist Testing Lab, and offices in Silicon Valley, Beijing, Shanghai, and Chengdu.',
+    _company_twitter: 'https://twitter.com/faradayfuture',
+    _company_video: 'https://genesis-cdn.ff.com/2019-Media-Summit/Video.zip'
+  },
+]
+
 const VERBRequests = [
   {
     company: 'Tesla',

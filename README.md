@@ -68,3 +68,13 @@ Data is stored in Mongodb database
 ## Notes
 
 All Rivian jobs should have `#app` added to their URL to send the applicant to the job application. Confirm this for other greenhouse jobs
+
+## Mongodb commands
+
+update publishDate for all `published` Samsung records
+```
+db.Samsung.updateMany({ "listingInfo": { $exists: true }, published: true }, {$currentDate: { publishDate: { $type: 'timestamp'}}})
+```
+
+Count all Samsung documents
+``` db.Samsung.countDocuments({ "listingInfo": { $exists: true }, published: false }) ```

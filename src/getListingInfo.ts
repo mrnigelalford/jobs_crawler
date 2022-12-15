@@ -8,8 +8,6 @@ const client = new MongoClient(process.env.mongo_url || '');
 const db = client.db('evhunt')
 
 const crawl = async (urls: any[], company: string) => {
-  const listings = client.db('evhunt').collection(company);
-
   const cheerio = new CheerioCrawler({
     minConcurrency: 5,
     maxConcurrency: 10,
@@ -20,9 +18,8 @@ const crawl = async (urls: any[], company: string) => {
 
     async requestHandler({ request, $ }) {
       const listingInfo = $('#content')?.html()?.replace(/(\r\n|\n|\r)/gm, "").trim();
-
       if (listingInfo) {
-        listings.updateOne({ url: request.url }, { $set: { listingInfo, '_job_location': $('.location').text()?.replace(/(\r\n|\n|\r)/gm, "").trim() } })
+        db.collection(company).updateOne({ url: request.url }, { $set: { listingInfo, '_job_location': $('.location').text()?.replace(/(\r\n|\n|\r)/gm, "").trim() } })
       }
     },
 
@@ -30,25 +27,20 @@ const crawl = async (urls: any[], company: string) => {
     // This function is called if the page processing failed more than maxRequestRetries + 1 times.
     failedRequestHandler({ request }) {
       console.debug(`Request ${request.url} failed twice. marking the position closed`);
-      const db = client.db('evhunt').collection(company);
-
-      db.updateOne({ url: request }, { $set: { closed: true } })
+      db.collection(company).updateOne({ url: request }, { $set: { closed: true } })
     },
   });
 
-  return cheerio.run(urls).then((onfulfilled => {
-    process.exit(0);
-  }))
+  return cheerio.run(urls);
+
 }
 
 const getListingInfo = async (companyName: string) => {
   const cleanedURLs: string[] = [];
-  const listings = db.collection(companyName).find({ "published": false, closed: false }).project({ url: 1, _id: 0 }).toArray();
+  const listings = db.collection(companyName).find({ published: false, closed: false }).project({ url: 1, _id: 0 }).toArray();
   (await listings).forEach(l => cleanedURLs.push(l.url));
   crawl(cleanedURLs, companyName)
 };
-
-// getListingInfo(greenhouseBoards[0].company)
 
 export {
   getListingInfo
