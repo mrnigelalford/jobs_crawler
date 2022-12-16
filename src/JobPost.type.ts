@@ -68,6 +68,8 @@ enum Company {
   samsung = 'Samsung',
   xosinc = 'Xosinc',
   faradayfutures = 'Faraday Futures',
+  lucid = 'Lucid',
+  revel = 'Revel'
 }
 
 enum State {
@@ -80,6 +82,7 @@ enum FeaturedMedia {
   'Faraday Futures' = 330,
   Xosinc = 331,
   Rivian = 69,
+  Lucid = 1944
 }
 
 enum listingType {
@@ -135,5 +138,6 @@ export {
   JobPost,
   Meta,
   DBJob,
-  FeaturedMedia
+  FeaturedMedia,
+  Company
 }

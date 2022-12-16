@@ -7,6 +7,8 @@ import { getListingInfo } from './getListingInfo.js';
 import dotenv from 'dotenv'
 import fetch from 'node-fetch';
 
+interface Listing { title: string; url: string; dateFound: string }
+
 dotenv.config();
 
 const client = new MongoClient(process.env.mongo_url || '');

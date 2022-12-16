@@ -1,9 +1,9 @@
+import { Company } from "./JobPost.type.js"
+
 const jobList = [
   // "https://www.everarecruitment.com/job/1274722-head-of-sales-north-america", - EV recruiter Europe
 
   // crack this batch next
-  "https://jobs.lever.co/lucidmotors", // lever, similar to greenhouse
-    // "https://www.lucidmotors.com/careers/search", (may not be needed)
   'https://recruiting.paylocity.com/Recruiting/Jobs/All/ddd48b68-5d30-4845-bd31-2cbbac035ac6/Lordstown-Motors-Corp', // lordstown
 
   // more complex broader search
@@ -25,25 +25,40 @@ const jobList = [
   // Infrastructure
   //  TODO - dig into ABB more deeply
   "https://careers.abb/global/en/job/ABB1GLOBAL84071661EXTERNALENGLOBAL/Sales-Director-Western-Region-E-mobility-US-REMOTE?utm_source=linkedin&utm_medium=phenom-feeds",
+  "https://evbox.com/en/about/careers#exploreJobs", // custom job board? similar to greenhouse
+  "https://www.evgo.com/company/careers/#open-positions", // charging infrastructure
+  "https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=275f2b3c-c1d2-4535-aedc-2637a5e2d9c6&ccId=19000101_000001&type=JS&lang=en_US", // commerical trucks in use around large scale environments
+  "https://apply.workable.com/flo-addenergie/?lng=en#jobs" // infrastructure. Workable site
+]
+
+const leverBoards = [
+  {
+    url: 'https://jobs.lever.co/lucidmotors',
+    company: Company.lucid
+  }
 ]
 
 const greenhouseBoards = [
   // vehicle manufactors
   {
     urls: ['https://boards.greenhouse.io/rivian'], // full rivian listings
-    company: 'Rivian'
+    company: Company.rivian
   },
   {
     urls: ['https://boards.greenhouse.io/samsungsemiconductor'],
-    company: 'Samsung'
+    company: Company.samsung
   },
   {
-    urls: [ "https://boards.greenhouse.io/xosinc"], // truck manufactor
-    company: 'Xosinc'
+    urls: ["https://boards.greenhouse.io/xosinc"], // truck manufactor
+    company: Company.xosinc
   },
   {
     urls: ['https://boards.greenhouse.io/faradayfuture'], // vehicle manufacturer
-    company: 'Faraday Futures'
+    company: Company.faradayfutures
+  },
+  {
+    urls: ['https://boards.greenhouse.io/revel/'], // EV vehicles, charger startup in NY/LA
+    company: Company.revel
   }
 ]
 
@@ -77,6 +92,13 @@ const companyMetadata = [
     _company_twitter: 'https://twitter.com/faradayfuture',
     _company_video: 'https://genesis-cdn.ff.com/2019-Media-Summit/Video.zip'
   },
+  {
+    _company_name: 'Lucid',
+    _company_website: 'https://lucidmotors.com',
+    _company_tagline: 'At Lucid, we set out to introduce the most captivating, luxury electric vehicles that elevate the human experience and transcend the perceived limitations of space, performance, and intelligence. Vehicles that are intuitive, liberating, and designed for the future of mobility.',
+    _company_twitter: 'https://twitter.com/lucidmotors',
+    _company_video: 'https://lucidmotors.com/media/video/Lucid_Air_First_Customer_Deliveries_EPK_20211103.mp4'
+  },
 ]
 
 const VERBRequests = [
@@ -98,5 +120,6 @@ const VERBRequests = [
 ]
 
 export {
-  greenhouseBoards
+  greenhouseBoards,
+  leverBoards
 }
