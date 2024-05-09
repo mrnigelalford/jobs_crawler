@@ -4,6 +4,7 @@ const jobList = [
   // "https://www.everarecruitment.com/job/1274722-head-of-sales-north-america", - EV recruiter Europe
 
   // crack this batch next
+  'https://about.polestar.com/careers/jobs/', // polestar
   'https://recruiting.paylocity.com/Recruiting/Jobs/All/ddd48b68-5d30-4845-bd31-2cbbac035ac6/Lordstown-Motors-Corp', // lordstown
 
   // more complex broader search
@@ -119,7 +120,16 @@ const VERBRequests = [
   }
 ]
 
+const linkedinHashtags = [
+  '#automotivejobs', '#manufacturingjobs' 
+]
+
 export {
   greenhouseBoards,
   leverBoards
 }
+
+EV idea:
+  // see open chargers that are down
+  // submit to repair
+  // send repair invoice and get paid immediately :-)

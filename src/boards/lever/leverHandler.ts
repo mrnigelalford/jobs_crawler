@@ -1,5 +1,5 @@
 import { CheerioCrawler } from 'crawlee';
-import { leverBoards } from '../../jobList.js';
+import { leverleverBoards } from '../../jobList.js';
 import { MongoClient } from "mongodb";
 import { Company, JobPost, Status, FeaturedMedia, Meta } from '../../JobPost.type.js';
 
@@ -141,41 +141,43 @@ const setLeverToWordpress = async () => {
   })
 }
 
-const crawl = async (urls: any[], company: string) => {
+const crawl = async (urls: string[], company: string) => {
   const cheerio = new CheerioCrawler({
     minConcurrency: 5,
     maxConcurrency: 10,
-    // On error, retry each page at most once.
     maxRequestRetries: 1,
-    // Increase the timeout for processing of each page.
     requestHandlerTimeoutSecs: 30,
-
     async requestHandler({ request, $ }) {
-        console.log('req: ', request.url)
-        const listingInfo = $('body > div.content-wrapper.posting-page > div > div:nth-child(2)').html()?.replace(/(\r\n|\n|\r)/gm, "").trim()
-  
-        if (listingInfo) {
-          db.collection(company).updateOne({ url: request.url }, { $set: { listingInfo } })
-        }
-    },
+      console.log('req: ', request.url);
+      const listingInfo = $('body > div.content-wrapper.posting-page > div > div:nth-child(2)')
+        .html()
+        ?.replace(/(\r\n|\n|\r)/gm, "")
+        .trim();
 
-    // TODO: Add another failure handler to account for the position being closed
+      if (listingInfo) {
+        db.collection(company).updateOne({ url: request.url }, { $set: { listingInfo } });
+      }
+    },
     // This function is called if the page processing failed more than maxRequestRetries + 1 times.
     failedRequestHandler({ request }) {
       console.debug(`Request ${request.url} failed twice. marking the position closed`);
-      db.collection(company).updateOne({ url: request }, { $set: { closed: true } })
+      db.collection(company).updateOne({ url: request.url }, { $set: { closed: true } });
     },
   });
 
   return cheerio.run(urls);
-}
+};
 
 const getListingInfo = async () => {
   const cleanedURLs: string[] = [];
-  const listings = db.collection(Company.lucid).find({ published: false, closed: false }).project({ url: 1, _id: 0 }).toArray();
-  (await listings).forEach(l => cleanedURLs.push(l.url));
-  console.debug('cu: ', cleanedURLs.length)
-  crawl(cleanedURLs, Company.lucid)
+  const listings = await db
+    .collection(Company.lucid)
+    .find({ published: false, closed: false })
+    .project({ url: 1, _id: 0 })
+    .toArray();
+  listings.forEach((l) => cleanedURLs.push(l.url));
+  console.debug('cleaned url length: ', cleanedURLs.length);
+  crawl(cleanedURLs, Company.lucid);
 };
 
 export {
